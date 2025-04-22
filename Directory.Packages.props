@@ -1,0 +1,19 @@
+<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="CommunityToolkit.Datasync.Client" Version="9.0.1" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server" Version="9.0.1" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.EntityFrameworkCore" Version="9.0.1" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.InMemory" Version="9.0.1" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.OpenApi" Version="9.0.1" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.Swashbuckle" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.4" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.1.18" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <UserSecretsId>70A29B24-A100-4C00-AE3C-2591E675D540</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Datasync.Server" />
+    <PackageReference Include="CommunityToolkit.Datasync.Server.EntityFrameworkCore" />
+    <PackageReference Include="CommunityToolkit.Datasync.Server.InMemory" />
+    <PackageReference Include="CommunityToolkit.Datasync.Server.OpenApi" />
+    <PackageReference Include="CommunityToolkit.Datasync.Server.Swashbuckle" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" />
+  </ItemGroup>
+</Project>
