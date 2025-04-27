@@ -1,6 +1,8 @@
 using CommunityToolkit.Datasync.Server;
+using CommunityToolkit.Datasync.Server.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Web.Db;
+using Web.Controllers;
+using Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -10,14 +12,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ServerDataContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddTransient<EntityTableRepository<Order>>();
+builder.Services.AddTransient<OrdersAccessControlProvider>();
+builder.Services.AddTransient<EntityTableRepository<Customer>>();
+builder.Services.AddTransient<CustomerAccessControlProvider>();
 
 var app = builder.Build();
 
 // Initialize the database
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<ServerDataContext>();
     await context.InitializeDatabaseAsync().ConfigureAwait(false);
 }
 

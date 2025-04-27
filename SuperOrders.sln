@@ -15,8 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagementClient", "src\ManagementClient\ManagementClient.csproj", "{D83AEF9F-970C-4DDB-BEDD-86BF1E0CF477}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerClient", "src\WorkerClient\WorkerClient.csproj", "{01246E6C-FFDE-8789-B42F-FA97D1F35CED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "src\Web\Web.csproj", "{51FECD8E-D5D9-4FC3-9FC2-3E9A7B0B935F}"
@@ -27,10 +25,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D83AEF9F-970C-4DDB-BEDD-86BF1E0CF477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D83AEF9F-970C-4DDB-BEDD-86BF1E0CF477}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D83AEF9F-970C-4DDB-BEDD-86BF1E0CF477}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D83AEF9F-970C-4DDB-BEDD-86BF1E0CF477}.Release|Any CPU.Build.0 = Release|Any CPU
 		{01246E6C-FFDE-8789-B42F-FA97D1F35CED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{01246E6C-FFDE-8789-B42F-FA97D1F35CED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01246E6C-FFDE-8789-B42F-FA97D1F35CED}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,7 +38,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D83AEF9F-970C-4DDB-BEDD-86BF1E0CF477} = {6ED356A7-8B47-4613-AD01-C85CF28491BD}
 		{01246E6C-FFDE-8789-B42F-FA97D1F35CED} = {6ED356A7-8B47-4613-AD01-C85CF28491BD}
 		{51FECD8E-D5D9-4FC3-9FC2-3E9A7B0B935F} = {6ED356A7-8B47-4613-AD01-C85CF28491BD}
 	EndGlobalSection

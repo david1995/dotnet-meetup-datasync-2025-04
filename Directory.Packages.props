@@ -4,12 +4,13 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="CommunityToolkit.Datasync.Client" Version="9.0.1" />
-    <PackageVersion Include="CommunityToolkit.Datasync.Server" Version="9.0.1" />
-    <PackageVersion Include="CommunityToolkit.Datasync.Server.EntityFrameworkCore" Version="9.0.1" />
-    <PackageVersion Include="CommunityToolkit.Datasync.Server.InMemory" Version="9.0.1" />
-    <PackageVersion Include="CommunityToolkit.Datasync.Server.OpenApi" Version="9.0.1" />
-    <PackageVersion Include="CommunityToolkit.Datasync.Server.Swashbuckle" Version="9.0.1" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Client" Version="9.0.2" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server" Version="9.0.2" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.EntityFrameworkCore" Version="9.0.2" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.InMemory" Version="9.0.2" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.OpenApi" Version="9.0.2" />
+    <PackageVersion Include="CommunityToolkit.Datasync.Server.Swashbuckle" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
