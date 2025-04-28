@@ -7,6 +7,7 @@ using CommunityToolkit.Datasync.Client.Http;
 using CommunityToolkit.Datasync.Client.Offline;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using CommunityToolkit.Datasync.Client.Authentication;
 
 namespace WorkerClient.Models;
 
@@ -19,8 +20,7 @@ public abstract class DatasyncClientData
 
     public bool Deleted { get; set; }
 
-    [Timestamp]
-    public byte[] Version { get; set; } = [];
+    public string? Version { get; set; }
 }
 
 public enum OrderStatus
@@ -33,6 +33,8 @@ public enum OrderStatus
 public class Order : DatasyncClientData
 {
     public OrderStatus Status { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
 
     public long? AssignedUserId { get; set; }
 
@@ -51,7 +53,7 @@ public class Customer : DatasyncClientData
     [StringLength(200)]
     public required string StreetAndNumber { get; set; }
 
-    public required int Plz { get; set; }
+    public required int PostalCode { get; set; }
 
     [StringLength(200)]
     public required string City { get; set; }
@@ -97,22 +99,32 @@ public class ClientDataContext : OfflineDbContext
 
     protected override void OnDatasyncInitialization(DatasyncOfflineOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseHttpClientOptions(new HttpClientOptions { Endpoint = new Uri("https://localhost:51368") });
+        GenericAuthenticationProvider authProvider = new(
+            _ => Task.FromResult(new AuthenticationToken
+            {
+                UserId = _userNameStore.UserName,
+                DisplayName = _userNameStore.UserName,
+                ExpiresOn = DateTimeOffset.MaxValue,
+                Token = _userNameStore.UserName
+            }));
+
+        optionsBuilder.UseHttpClientOptions(new HttpClientOptions
+        {
+            Endpoint = new Uri("https://localhost:51368"),
+            HttpPipeline = [ authProvider ]
+        });
         optionsBuilder.Entity<Order>(o =>
         {
-            o.Query.WithParameter("UserName", _userNameStore.UserName);
             o.Endpoint = new Uri("tables/orders", UriKind.Relative);
         });
 
         optionsBuilder.Entity<Customer>(o =>
         {
-            o.Query.WithParameter("UserName", _userNameStore.UserName);
             o.Endpoint = new Uri("tables/customers", UriKind.Relative);
         });
 
         optionsBuilder.Entity<InMemoryCustomerStats>(o =>
         {
-            o.Query.WithParameter("UserName", _userNameStore.UserName);
             o.Endpoint = new Uri("tables/inmemorycustomerstats", UriKind.Relative);
         });
 

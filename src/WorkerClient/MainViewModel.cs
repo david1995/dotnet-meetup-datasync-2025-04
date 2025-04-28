@@ -11,11 +11,16 @@ public partial class MainViewModel : ObservableValidator
 {
     private readonly SynchronisationAction _synchronisationAction;
     private readonly UserNameStore _userNameStore;
+    private readonly LoadDataMainViewModelQuery _loadDataMainViewModelQuery;
 
-    public MainViewModel(SynchronisationAction synchronisationAction, UserNameStore userNameStore)
+    public MainViewModel(
+        SynchronisationAction synchronisationAction,
+        UserNameStore userNameStore,
+        LoadDataMainViewModelQuery loadDataMainViewModelQuery)
     {
         _synchronisationAction = synchronisationAction;
         _userNameStore = userNameStore;
+        _loadDataMainViewModelQuery = loadDataMainViewModelQuery;
         UserName = _userNameStore.UserName;
     }
 
@@ -47,7 +52,23 @@ public partial class MainViewModel : ObservableValidator
             MessageBox.Show(App.CurrentApp.MainWindow!, "Pull: could not reach server", "Datasync error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
+        await LoadDataAsync();
         IsSynchronising = false;
+    }
+
+    public async Task LoadDataAsync()
+    {
+        var query = await _loadDataMainViewModelQuery.LoadAsync();
+
+        _ = App.CurrentApp.MainWindow!.Dispatcher.BeginInvoke(() =>
+        {
+            Orders.Clear();
+
+            foreach (var order in query)
+            {
+                Orders.Add(order);
+            }
+        });
     }
 
     partial void OnUserNameChanged(string value)
@@ -58,6 +79,41 @@ public partial class MainViewModel : ObservableValidator
         }
 
         _userNameStore.UserName = value;
+    }
+}
+
+public class LoadDataMainViewModelQuery
+{
+    private readonly IDbContextFactory<ClientDataContext> _contextFactory;
+    private readonly CompleteOrderAction _completeOrderAction;
+    private readonly CancelOrderAction _cancelOrderAction;
+
+    public LoadDataMainViewModelQuery(
+        IDbContextFactory<ClientDataContext> contextFactory,
+        CompleteOrderAction completeOrderAction,
+        CancelOrderAction cancelOrderAction)
+    {
+        _contextFactory = contextFactory;
+        _completeOrderAction = completeOrderAction;
+        _cancelOrderAction = cancelOrderAction;
+    }
+
+    public async ValueTask<IReadOnlyCollection<OrderViewModel>> LoadAsync()
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
+        return context.Orders
+            .AsNoTracking()
+            .AsEnumerable()
+            .Select(o => new OrderViewModel(_completeOrderAction, _cancelOrderAction)
+            {
+                Id = o.Id,
+                CreatedAt = o.CreatedAt,
+                IsCanceled = o.Status is OrderStatus.Cancelled,
+                IsCompleted = o.Status is OrderStatus.Delivered,
+                CustomerName = o.Customer.Name
+            })
+            .ToArray();
     }
 }
 
@@ -73,7 +129,8 @@ public partial class OrderViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanComplete), nameof(CanCancel))]
+    [NotifyPropertyChangedFor(nameof(CanComplete))]
+    [NotifyPropertyChangedFor(nameof(CanCancel))]
     public partial string Id { get; set; } = null!;
 
     [ObservableProperty]
@@ -84,15 +141,17 @@ public partial class OrderViewModel : ObservableValidator
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanComplete))]
+    [NotifyPropertyChangedFor(nameof(CanCancel))]
     public partial bool IsCompleted { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanComplete))]
     [NotifyPropertyChangedFor(nameof(CanCancel))]
     public partial bool IsCanceled { get; set; }
 
-    public bool CanComplete => !IsCompleted && Id is { Length: > 0 };
+    public bool CanComplete => !IsCompleted && !IsCanceled && Id is { Length: > 0 };
 
-    public bool CanCancel => !IsCanceled && Id is { Length: > 0 };
+    public bool CanCancel => !IsCanceled && !IsCompleted && Id is { Length: > 0 };
 
     [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanComplete))]
     public async Task CompleteAsync()

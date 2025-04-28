@@ -15,7 +15,10 @@ public class OrdersAccessControlProvider : IAccessControlProvider<Order>
     public OrdersAccessControlProvider(ServerDataContext context, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
-        var userName = httpContextAccessor.HttpContext!.Request.Query["UserName"].FirstOrDefault(); // please do not do this in real projects
+        
+        // please do not do this in production, use real authentication
+        var userName = httpContextAccessor.HttpContext!.Request.Headers["Authorization"].FirstOrDefault()?["Bearer ".Length ..];
+
         _userId = context.Users.First(u => u.UserName == userName).Id;
     }
 
@@ -57,7 +60,9 @@ public class CustomerAccessControlProvider : IAccessControlProvider<Customer>
     public CustomerAccessControlProvider(ServerDataContext context, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
-        var userName = httpContextAccessor.HttpContext!.Request.Query["UserName"].FirstOrDefault(); // please do not do this in real projects
+        // please do not do this in production, use real authentication
+        var userName = httpContextAccessor.HttpContext!.Request.Headers["Authorization"].FirstOrDefault()?["Bearer ".Length..];
+
         _userId = context.Users.First(u => u.UserName == userName).Id;
     }
 
@@ -84,6 +89,84 @@ public class CustomerAccessControlProvider : IAccessControlProvider<Customer>
         TableOperation operation,
         Customer entity,
         CancellationToken cancellationToken = new()) => ValueTask.CompletedTask;
+}
+
+[Route("management")]
+public class ManagementController : Controller
+{
+    private readonly ServerDataContext _context;
+    private readonly TimeProvider _timeProvider;
+
+    public ManagementController(ServerDataContext context, TimeProvider timeProvider)
+    {
+        _context = context;
+        _timeProvider = timeProvider;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> RecreateDatabase()
+    {
+        await _context.Database.EnsureDeletedAsync();
+        await _context.Database.EnsureCreatedAsync();
+
+        IReadOnlyList<User> users =
+        [
+            new() { UserName = "David" },
+            new() { UserName = "Raoul" }
+        ];
+
+        await _context.Users.AddRangeAsync(users);
+
+        await _context.SaveChangesAsync();
+
+        await _context.Customers.AddAsync(new()
+        {
+            Name = "TechTalk",
+            StreetAndNumber = "Leonard-Bernstein-Straﬂe 10/16",
+            PostalCode = 1220,
+            City = "Vienna",
+            Orders = new List<Order>([
+                new()
+                {
+                    AssignedUser = users[0],
+                    CreatedAt = _timeProvider.GetUtcNow(),
+                    Status = OrderStatus.Ready
+                },
+                new()
+                {
+                    AssignedUser = users[1],
+                    CreatedAt = _timeProvider.GetUtcNow().AddDays(-10),
+                    Status = OrderStatus.Ready
+                }
+            ])
+        });
+
+        await _context.Customers.AddAsync(new()
+        {
+            Name = "Some Random Company",
+            StreetAndNumber = "Random Street 1",
+            PostalCode = 1220,
+            City = "Vienna",
+            Orders = new List<Order>([
+                new()
+                {
+                    AssignedUser = users[0],
+                    CreatedAt = _timeProvider.GetUtcNow(),
+                    Status = OrderStatus.Ready
+                },
+                new()
+                {
+                    AssignedUser = users[1],
+                    CreatedAt = _timeProvider.GetUtcNow().AddDays(-10),
+                    Status = OrderStatus.Ready
+                }
+            ])
+        });
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
 }
 
 [Route("tables/orders")]

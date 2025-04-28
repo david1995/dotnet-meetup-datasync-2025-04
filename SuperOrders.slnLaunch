@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "All",
+    "Projects": [
+      {
+        "Path": "src\\WorkerClient\\WorkerClient.csproj",
+        "Action": "Start",
+        "DebugTarget": "WorkerClient"
+      },
+      {
+        "Path": "src\\Web\\Web.csproj",
+        "Action": "Start",
+        "DebugTarget": "Web"
+      }
+    ]
+  }
+]

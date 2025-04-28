@@ -71,6 +71,7 @@ public partial class App : Application
         hostBuilder.Services.AddSingleton<SynchronisationAction>();
         hostBuilder.Services.AddSingleton<CompleteOrderAction>();
         hostBuilder.Services.AddSingleton<CancelOrderAction>();
+        hostBuilder.Services.AddSingleton<LoadDataMainViewModelQuery>();
         hostBuilder.Services.AddTransient<MainViewModel>();
     }
 

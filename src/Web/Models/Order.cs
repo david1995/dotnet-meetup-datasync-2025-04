@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Datasync.Server.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ namespace Web.Models;
 
 public class User
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
 
     [StringLength(50)]
@@ -24,14 +27,16 @@ public enum OrderStatus
 
 public class Order : EntityTableData
 {
+    public Order()
+    {
+        base.Id = null!;
+    }
+
     public DateTimeOffset CreatedAt { get; set; }
 
     public OrderStatus Status { get; set; }
 
     public long? AssignedUserId { get; set; }
-
-    [StringLength(200)]
-    public string Name { get; set; } = null!;
 
     [JsonIgnore]
     public virtual User? AssignedUser { get; set; }
@@ -45,13 +50,21 @@ public class Order : EntityTableData
 
 public class Customer : EntityTableData
 {
+    public Customer()
+    {
+        base.Id = null!;
+    }
+
     [StringLength(200)]
     public required string StreetAndNumber { get; set; }
 
-    public required int Plz { get; set; }
+    public required int PostalCode { get; set; }
 
     [StringLength(200)]
     public required string City { get; set; }
+
+    [StringLength(200)]
+    public required string Name { get; set; }
 
     [JsonIgnore]
     public virtual ICollection<Order> Orders { get; set; } = [];
@@ -93,7 +106,8 @@ public class ServerDataContext
 
             modelBuilder.Entity(type.ClrType)
                 .Property(nameof(EntityTableData.Id))
-                .HasValueGenerator(typeof(GuidStringValueGenerator))
+                .HasValueGenerator<GuidStringValueGenerator>()
+                .ValueGeneratedOnAdd()
                 .HasMaxLength(200);
         }
     }
@@ -101,9 +115,9 @@ public class ServerDataContext
 
 public class GuidStringValueGenerator : ValueGenerator
 {
-    protected override object? NextValue(EntityEntry entry)
+    protected override object NextValue(EntityEntry entry)
     {
-        return Guid.CreateVersion7().ToString();
+        return Guid.NewGuid().ToString();
     }
 
     public override bool GeneratesTemporaryValues => false;
