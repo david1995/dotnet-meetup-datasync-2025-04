@@ -3,9 +3,50 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:workerClient="clr-namespace:WorkerClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Worker Client" Height="450" Width="800"
+        DataContext="{Binding Path=ViewModel, RelativeSource={RelativeSource Self}, Mode=OneWay}">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8">
+            <Button Command="{Binding Path=SynchroniseCommand}">Synchronise</Button>
+
+            <TextBlock Text="User Name:" />
+            <TextBox Text="{Binding UserName}" Width="200" />
+        </StackPanel>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding Path=Orders, Mode=OneWay}" Margin="8">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type workerClient:OrderViewModel}">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsCompleted, Mode=OneWay}" IsEnabled="false" />
+                            <TextBlock FontSize="20" Text="{Binding Path=CustomerName, Mode=OneWay}" />
+                        </StackPanel>
+                        
+                        <TextBlock Text="{Binding Path=CreatedAt, Mode=OneWay}" />
+
+                        <Button
+                            Command="{Binding CompleteCommand, Mode=OneWay}"
+                            IsEnabled="{Binding CanComplete, Mode=OneWay}">
+
+                            Complete order
+                        </Button>
+
+                        <Button
+                            Command="{Binding CancelCommand, Mode=OneWay}"
+                            IsEnabled="{Binding CanCancel, Mode=OneWay}">
+
+                            Cancel order
+                        </Button>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Window>

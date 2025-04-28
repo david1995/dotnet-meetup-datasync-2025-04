@@ -10,11 +10,15 @@
     <PackageVersion Include="CommunityToolkit.Datasync.Server.InMemory" Version="9.0.2" />
     <PackageVersion Include="CommunityToolkit.Datasync.Server.OpenApi" Version="9.0.2" />
     <PackageVersion Include="CommunityToolkit.Datasync.Server.Swashbuckle" Version="9.0.2" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.1.18" />
   </ItemGroup>
 </Project>

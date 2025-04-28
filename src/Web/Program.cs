@@ -12,11 +12,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<ServerDataContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddTransient<EntityTableRepository<Order>>();
+builder.Services.AddTransient<EntityTableRepository<Order>>(svc => new(svc.GetRequiredService<ServerDataContext>()));
 builder.Services.AddTransient<OrdersAccessControlProvider>();
-builder.Services.AddTransient<EntityTableRepository<Customer>>();
+builder.Services.AddTransient<EntityTableRepository<Customer>>(svc => new (svc.GetRequiredService<ServerDataContext>()));
 builder.Services.AddTransient<CustomerAccessControlProvider>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
 

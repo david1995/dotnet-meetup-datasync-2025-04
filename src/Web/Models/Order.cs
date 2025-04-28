@@ -2,6 +2,8 @@
 using System.Text.Json.Serialization;
 using CommunityToolkit.Datasync.Server.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Web.Models;
 
@@ -16,9 +18,8 @@ public class User
 public enum OrderStatus
 {
     Ready = 1,
-    Assigned = 2,
-    Delivered = 3,
-    Cancelled = 4
+    Delivered = 2,
+    Cancelled = 3
 }
 
 public class Order : EntityTableData
@@ -28,6 +29,9 @@ public class Order : EntityTableData
     public OrderStatus Status { get; set; }
 
     public long? AssignedUserId { get; set; }
+
+    [StringLength(200)]
+    public string Name { get; set; } = null!;
 
     [JsonIgnore]
     public virtual User? AssignedUser { get; set; }
@@ -56,6 +60,11 @@ public class Customer : EntityTableData
 public class ServerDataContext
     : DbContext
 {
+    public ServerDataContext(DbContextOptions<ServerDataContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<Order> Orders => Set<Order>();
 
     public DbSet<Customer> Customers => Set<Customer>();
@@ -70,4 +79,32 @@ public class ServerDataContext
     {
         await Database.EnsureCreatedAsync().ConfigureAwait(false);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        foreach (var type in modelBuilder.Model.GetEntityTypes()
+                     .Where(t => t.ClrType.IsSubclassOf(typeof(EntityTableData))))
+        {
+            modelBuilder.Entity(type.ClrType)
+                .HasKey(nameof(EntityTableData.Id))
+                .IsClustered(false);
+
+            modelBuilder.Entity(type.ClrType)
+                .Property(nameof(EntityTableData.Id))
+                .HasValueGenerator(typeof(GuidStringValueGenerator))
+                .HasMaxLength(200);
+        }
+    }
+}
+
+public class GuidStringValueGenerator : ValueGenerator
+{
+    protected override object? NextValue(EntityEntry entry)
+    {
+        return Guid.CreateVersion7().ToString();
+    }
+
+    public override bool GeneratesTemporaryValues => false;
 }

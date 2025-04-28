@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using CommunityToolkit.Datasync.Server;
 using CommunityToolkit.Datasync.Server.EntityFrameworkCore;
 using CommunityToolkit.Datasync.Server.InMemory;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 
@@ -88,7 +87,6 @@ public class CustomerAccessControlProvider : IAccessControlProvider<Customer>
 }
 
 [Route("tables/orders")]
-[Authorize]
 public class OrdersController : TableController<Order>
 {
     public OrdersController(
@@ -97,10 +95,28 @@ public class OrdersController : TableController<Order>
         : base(repository, accessControlProvider)
     {
     }
+
+    protected override async ValueTask PostCommitHookAsync(
+        TableOperation operation,
+        Order entity,
+        CancellationToken cancellationToken = new())
+    {
+        if (operation is TableOperation.Update
+            && entity is
+            {
+                Status: OrderStatus.Cancelled,
+                Deleted: false
+            })
+        {
+            entity.Deleted = true;
+        }
+
+        await base.PostCommitHookAsync(operation, entity, cancellationToken);
+    }
+
 }
 
 [Route("tables/customers")]
-[Authorize]
 public class CustomersController : TableController<Customer>
 {
     public CustomersController(
@@ -113,13 +129,12 @@ public class CustomersController : TableController<Customer>
 
 public class InMemoryCustomerStats : InMemoryTableData
 {
-    public int OrdersCreatedInThisMonth { get; set; }
+    public required string CustomerId { get; set; }
 
-    public int WorkerCountForOrders { get; set; }
+    public int OrdersCreatedInThisMonth { get; set; }
 }
 
 [Route("tables/inmemorycustomerstats")]
-[Authorize]
 public class CustomerStatsController : TableController<InMemoryCustomerStats>
 {
     public CustomerStatsController(ServerDataContext context, TimeProvider timeProvider)
@@ -139,25 +154,25 @@ public class CustomerStatsController : TableController<InMemoryCustomerStats>
                 .Select(t => new InMemoryCustomerStats
                 {
                     Id = t.Id,
-                    OrdersCreatedInThisMonth = t.OrdersCreatedThisMonth,
-                    WorkerCountForOrders = t.WorkerCountForOrders
+                    CustomerId = t.Id,
+                    OrdersCreatedInThisMonth = t.OrdersCreatedThisMonth
                 }));
     }
 
     [NonAction]
-    public override Task<IActionResult> CreateAsync(CancellationToken cancellationToken = new CancellationToken())
+    public override Task<IActionResult> CreateAsync(CancellationToken cancellationToken = new())
     {
         throw new NotSupportedException();
     }
 
     [NonAction]
-    public override Task<IActionResult> DeleteAsync(string id, CancellationToken cancellationToken = new CancellationToken())
+    public override Task<IActionResult> DeleteAsync(string id, CancellationToken cancellationToken = new())
     {
         throw new NotSupportedException();
     }
 
     [NonAction]
-    public override Task<IActionResult> ReplaceAsync(string id, CancellationToken cancellationToken = new CancellationToken())
+    public override Task<IActionResult> ReplaceAsync(string id, CancellationToken cancellationToken = new())
     {
         throw new NotSupportedException();
     }

@@ -3,7 +3,6 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
     <UserSecretsId>70A29B24-A100-4C00-AE3C-2591E675D540</UserSecretsId>
   </PropertyGroup>
 
@@ -14,6 +13,7 @@
     <PackageReference Include="CommunityToolkit.Datasync.Server.OpenApi" />
     <PackageReference Include="CommunityToolkit.Datasync.Server.Swashbuckle" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
